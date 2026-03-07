@@ -11,20 +11,31 @@ def chat():
     session_id = request.json['session_id']
     message = request.json['message']
 
-    key = f"session:{session_id}"
+    session_key = f"session:{session_id}"
+    cache_key = f"cache:{message}"
+
+    cached = r.get(cache_key)
+    if cached:
+        return jsonify({
+            "cached": True,
+            "response": cached
+        })
     
-    history = r.get(key)
+    r.rpush(session_key, message)
 
-    if history:
-        history = json.loads(history)
-    else:
-        history = []
+    # keep only last 20 messages
+    r.ltrim(session_key, -20, -1)
+    
+    history = r.lrange(session_key, 0, -1)
 
-    history.append(message)
-    r.set(key, json.dumps(history), ex=3600)
+    response = f"AI response to: {message}"
+
+    # Cache the response for 1 hour
+    r.set(cache_key, response, ex=3600)
 
     return jsonify({
-        "session": session_id,
+        "cached": False,
+        "response": response,
         "history": history
     })
 
