@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import redis
 import json
+import time
 from vector_memory import search_memory
 
 app = Flask(__name__)
@@ -18,6 +19,12 @@ def check_rate_limit(user_id):
     if count > RATE_LIMIT:
         return False
     return True
+
+def generate_stream(text):
+    words = text.split()
+    for word in words:
+        yield f"data: {word}\n\n"
+        time.sleep(0.3)  # simulate delay
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -59,6 +66,14 @@ def chat():
         "status": "job queued",
         "context_found": context
     })
+
+@app.route("/stream")
+def stream():
+
+    message = request.args.get("message")
+    response_text = f"Redis is an in-memory data structure store used as a database, cache, and message broker. It supports various data structures such as strings, hashes, lists, sets, and more. Redis is known for its high performance and is often used for real-time applications, caching, and session management."
+
+    return Response(generate_stream(response_text), mimetype='text/event-stream')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

@@ -28,8 +28,12 @@ while True:
         context_text = ""
     time.sleep(2)  # simulate processing time
 
+    # for token in context_text.split():
+    #     print(f"Streaming token: {token}")
+    #     time.sleep(0.3)  # simulate delay
+
     response = f"""Context:{context}
-    
+
                 Answer: 
                 Based on the knowledge above, here is the answer to your question: {message}"""
                 
