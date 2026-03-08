@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import redis
 import json
+from vector_memory import search_memory
 
 app = Flask(__name__)
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
@@ -53,11 +54,11 @@ def chat():
     }
 
     r.lpush("queue:jobs", json.dumps(job))
-    
+    context = search_memory(message)
     return jsonify({
         "status": "job queued",
-        "history": history
+        "context_found": context
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

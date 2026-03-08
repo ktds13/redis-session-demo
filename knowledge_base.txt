@@ -1,0 +1,7 @@
+Redis is an in-memory key-value database designed for high performance.
+
+Python is a popular programming language used for backend development and AI.
+
+Flask is a lightweight Python web framework used to build APIs.
+
+Vector databases store embeddings and allow semantic search.
